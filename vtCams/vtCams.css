@@ -1,0 +1,150 @@
+@charset "UTF-8";
+/* ************************************************************************* *
+ * VtCams                                                                    *
+ * ======                                                                    *
+ * This is a hand-coded web page that displays traffic camera images in the  *
+ * state of Vermont.  The HTML, the CSS, and the JavaScript are all original *
+ * by me and I make no copyright or ownership stipulations.  Note that the   *
+ * camera images that I link to are not mine, but are instead from web sites *
+ * operated by the state of Vermont.                                         *
+ *                                                                           *
+ * -John Berenberg, January 2020.                                            *
+ * ************************************************************************* */
+
+/* ************************************************************************* *
+ * I use the following site to validate my CSS.                              *
+ *                                                                           *
+ * http://jigsaw.w3.org/css-validator/                                       *
+ * ************************************************************************* */
+
+/* ************************************************************************* *
+ |                Styles for "responsive web design" (RWD)                   |
+ |                                                                           |
+ | Responsive web design is an approach that makes web pages render well on  |
+ | a variety of devices and window or screen sizes.  It uses only HTML and   |
+ | CSS, and is not a program or a JavaScript.                                |
+ |                                                                           |
+ | The styles in this section are based on the tutorial pages at w3schools.  |
+ * ************************************************************************* */
+
+  * { box-sizing: border-box; }
+
+  /* ******************************************** *
+   | Extra-small devices (phones, 600px and down) |
+   * ******************************************** */
+    [class*="col-"]  { width: 100%; }
+
+  /* *************************************************************** *
+   | Small devices (portrait tablets and large phones, 600px and up) |
+   * *************************************************************** */
+    @media only screen and (min-width: 600px) {
+      .col-s-1    { width:   8.33%; }
+      .col-s-2    { width:  16.66%; }
+      .col-s-3    { width:  25%;    }
+      .col-s-4    { width:  33.33%; }
+      .col-s-5    { width:  41.66%; }
+      .col-s-6    { width:  50%;    }
+      .col-s-7    { width:  58.33%; }
+      .col-s-8    { width:  66.66%; }
+      .col-s-9    { width:  75%;    }
+      .col-s-10   { width:  83.33%; }
+      .col-s-11   { width:  91.66%; }
+      .col-s-12   { width: 100%;    }
+    }
+
+  /* *************************************************************** *
+   | Medium devices                (landscape tablets, 768px and up) |
+   * *************************************************************** */
+    @media only screen and (min-width: 768px) {
+      .col-m-1    { width:   8.33%; }
+      .col-m-2    { width:  16.66%; }
+      .col-m-3    { width:  25%;    }
+      .col-m-4    { width:  33.33%; }
+      .col-m-5    { width:  41.66%; }
+      .col-m-6    { width:  50%;    }
+      .col-m-7    { width:  58.33%; }
+      .col-m-8    { width:  66.66%; }
+      .col-m-9    { width:  75%;    }
+      .col-m-10   { width:  83.33%; }
+      .col-m-11   { width:  91.66%; }
+      .col-m-12   { width: 100%;    }
+    }
+  /* *************************************************************** *
+   | Large devices                  (laptops/desktops, 992px and up) |
+   * *************************************************************** */
+    @media only screen and (min-width: 992px) {
+      .col-l-1    { width:   8.33%; }
+      .col-l-2    { width:  16.66%; }
+      .col-l-3    { width:  25%;    }
+      .col-l-4    { width:  33.33%; }
+      .col-l-5    { width:  41.66%; }
+      .col-l-6    { width:  50%;    }
+      .col-l-7    { width:  58.33%; }
+      .col-l-8    { width:  66.66%; }
+      .col-l-9    { width:  75%;    }
+      .col-l-10   { width:  83.33%; }
+      .col-l-11   { width:  91.66%; }
+      .col-l-12   { width: 100%;    }
+    }
+  /* *************************************************************** *
+   | Extra large devices (large laptops and desktops, 1200px and up) |
+   * *************************************************************** */
+    @media only screen and (min-width:1200px) {
+      .col-xl-1   { width:   8.33%; }
+      .col-xl-2   { width:  16.66%; }
+      .col-xl-3   { width:  25%;    }
+      .col-xl-4   { width:  33.33%; }
+      .col-xl-5   { width:  41.66%; }
+      .col-xl-6   { width:  50%;    }
+      .col-xl-7   { width:  58.33%; }
+      .col-xl-8   { width:  66.66%; }
+      .col-xl-9   { width:  75%;    }
+      .col-xl-10  { width:  83.33%; }
+      .col-xl-11  { width:  91.66%; }
+      .col-xl-12  { width: 100%;    }
+    }
+
+  [class*="col-"]
+                { float: left; padding:     5px   1px    5px 0px; }
+                                        /*  top right bottom left */
+  .row::after   { content: "";
+                  clear: both;
+                  display: table; }
+
+/* ************************************************************************* *
+ |                               Other styles                                |
+ |                                                                           |
+ | These are the styles specific to this web page.                           |
+ * ************************************************************************* */
+
+/*
+div         { border           : 1px solid lightBlue; }
+*/
+
+.header     { background-color : DarkOrchid;
+              color            : White;        }
+.header div { background-color : Inherit;
+              color            : Inherit;      }
+table       { border-spacing   : 1em;
+              border-collapse  : collapse;     }
+figure      { margin : 0;
+              padding: 5px   20px    0px  20px;
+                 /*    top  right bottom  left */
+              border : 2px  solid  green;      }
+                 /*  width  style  color       */
+figcaption  { font-family : "Open Sans","Lucida Sans Unicode",Verdana,Tahoma,"DejaVu Sans",sans-serif;
+              font-size   : large;
+              font-weight : bold;              }
+img         { width       : 100%;
+              max-width   : 100%;
+              height      : auto;
+              transition  : 2s;                }
+.remark     { font-size   : 16pt;
+              padding     : 0 10px 0 0;        }
+.prewrap    { white-space : pre-wrap;          }
+.groovy     { border      : 0.5em Groove Aqua;
+              padding-bottom : 6px; }
+#iDIVW_Sz   { text-align  : right;             }
+select      {  }
+optgroup    { font-size   :  8pt; background-color: cyan;  }
+option      { font-size   : 16pt; background-color: ivory; }

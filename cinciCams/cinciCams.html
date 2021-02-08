@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <title>CinciCams</title>
+  <meta   charset="UTF-8">
+  <meta   name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- ********************************************************************* *
+   * CinciCams                                                               *
+   * =========                                                               *
+   * This is a hand-coded web page that displays traffic camera images in    *
+   * the greater Cincinnati OH area.  The HTML, the CSS, and the JavaScript  *
+   * are all original by me and I make no copyright or ownership             *
+   * stipulations.  Note that the camera images that I link to are not mine, *
+   * but are instead from web sites operated by departments of the states of *
+   * Ohio or Kentucky.                                                       *
+   *                                                                         *
+   * -John Berenberg, January 2020.                                          *
+   * *********************************************************************** *
+
+   * *********************************************************************** *
+   * I use the following site to validate my HTML.                           *
+   *                                                                         *
+   * https://validator.w3.org/                                               *
+   * ********************************************************************* -->
+
+  <!-- ********************************************************************* *
+   * The following section aborts the script if the browser embeds a version *
+   * of JavaScript that is too down-level.  Ironically, the language=version *
+   * script element is deprecated in favor of type=text/javascript, except   *
+   * that does not allow the version to be disclosed.  Live with it.         *
+   *                                                                         *
+   * Particular up-level JavaScript features used include arrow function     *
+   * syntax, array and object destructuring syntax, and template literal     *
+   * syntax.                                                                 *
+   * ********************************************************************* -->
+  <script language="Javascript1.1"> JSversion = 1.1; </script>
+  <script language="Javascript1.2"> JSversion = 1.2; </script>
+  <script language="Javascript1.3"> JSversion = 1.3; </script>  <!-- My IE -->
+  <script language="Javascript1.4"> JSversion = 1.4; </script>
+  <script language="Javascript1.5"> JSversion = 1.5; </script>  <!-- My Edge --> <!-- My FireFox -->
+  <script language="Javascript1.6"> JSversion = 1.6; </script>
+  <script language="Javascript1.7"> JSversion = 1.7; </script>  <!-- My Chrome -->
+  <script language="Javascript1.8"> JSversion = 1.8; </script>
+  <script language="Javascript1.9"> JSversion = 1.9; </script>
+  <script>
+    if ( JSversion < 1.5 ) {
+      /*       u2639 = white frowning face */
+      alert( "\u2639 This page"
+           + "\n      [ " + document.URL + " ]"
+           + "\nuses JavaScript features that are not supported by this browser."
+           + "\n\nThe JavaScript version (not the browser version) is " + JSversion + " but needs to be at least 1.5."
+           + "\n\nTry a different browser." );
+      window.location.href = "about:blank";
+    }
+  </script>
+  <!-- ********************************************************************* *
+   * End of JavaScript version check.                                        *
+   * ********************************************************************* -->
+
+  <link   rel="stylesheet" type="text/css" href="cinciCams.css">
+
+  <script src="cinciCams.js"></script>
+</head>
+
+
+<!-- ================================================================== *
+ *                         The HTML <body ...>                          *
+ * ================================================================== -->
+
+<body onload="setGlobals();">
+
+  <!-- ======================================================================= *
+   * Header                                                                    *
+   * ======================================================================= -->
+  <div class="header">
+    <div id="iDIV_TOD" class="col-12 col-s-8 col-m-9 col-l-9 col-xl-10">
+      <!-- -->
+    </div> <!-- iDIV_TOD -->
+
+    <div id="iDIVW_Sz" class="col-12 col-s-4 col-m-3 col-l-3  col-xl-2">
+      <!-- -->
+    </div> <!-- iDIVW_Sz -->
+  </div>  <!-- .header -->
+
+  <!-- ======================================================================= *
+   * Main - Displayed for normal size, hidden for embiggen                     *
+   * ======================================================================= -->
+  <div id="iDIVMain" style="display: block;">
+    <div class="remark col-12 col-s-6 col-m-6 col-l-7 col-xl-8">
+      This script refreshes the camera image from
+      the internet at an interval you can adjust.
+      <P>ODOT and KYTC refresh the images on the internet at
+      their own schedule, sometimes every few seconds.
+    </div>
+
+    <div class="remark col-12 col-s-6 col-m-6 col-l-5 col-xl-4">
+      <label for="iINP_refreshTime" class="prewrap"
+        >Refresh every <input id="iINP_refreshTime" type="text" size="2" value=""> seconds.</label>
+
+      <br>
+      <span id="iSPANinfo" class="prewrap">Next reload in <u><span id="iSPANCountDown"></span></u> seconds.</span>
+
+      <br>
+      <input  type="button" id="iINP_toggleTimer" onclick="toggleTimer();" value="Pause Timer">
+
+      <button type="button" id="iBTN_refresh"     onclick="iSEL.dispatchEvent( aChangeEvent );">
+        Manual Refresh
+      </button>
+
+      <br>
+      <span class="prewrap">Click on camera image to <span style="font-size: 150%;">embiggen</span>.</span>
+    </div>
+
+  <!-- ======================================================================= *
+   * Each HTML <OPTION> tag has an index distinct from its <OPTION value=...>. *
+   * The indexes are assigned sequentially in the order each <OPTION> tag is   *
+   * encountered, starting from 0.  The value is instead the string from the   *
+   * value=... .  And the index and the value are entirely distinct from the   *
+   * text between the <OPTION> and </OPTION> tags.                             *
+   *                                                                           *
+   * The drop-down items are displayed in index order, using the above         *
+   * mentioned text.  The value is not displayed there, it is used by the      *
+   * program to make decisions when an item is selected.                       *
+   * ======================================================================= -->
+    <div class="groovy remark col-12 col-s-12 col-m-12 col-l-12 col-xl-12">
+    <label for="iSEL">Select location from the list
+    <select id="iSEL">
+<!--
+    Format of <option> tags is
+      <option value="cam location | N link | E link | W link | S link "> Public text for drop-down </option>
+    Format of cam location is
+      camAuthority;optCamNumber;optCamSuffix;optXtraSuffixForLarge
+    Format of each N/E/W/S link is
+      linkType;linkParam;labelForCompass
+  -->
+        <option value="none | CCTV;4155;S__Lebanon | KYTC;0180;Maysville | CCTV;037;Downtown | CCTV;063;Indiana 
+                                                                                   " selected> ODOT/KYTC Camera List </option>
+
+      <optgroup label="I-71 (From river northward)">
+                     <!-- +1 is North -->
+        <option value="CCTV;035;a;-L | CCTV;022;I-75 | INCR;+1;I-71 | KYTC;1911;I-71/75__(KY) | 
+                                                                                            "> I-71 at I-75                    &emsp;&emsp;&emsp;&emsp;  1 </option>
+        <option value="CINCI;;I-71Scripps_Building;
+                                     || INCR;+1;I-71     |               | INCR;-1;I-71/75  "> I-71 at Scripps Building, Downtown Cincinnati  &emsp;&emsp;&emsp;&emsp;  1 </option>
+        <option value="CCTV;042;a;   | INCR;+1;(TunnelCams) | CCTV;037;I-71 |KYTC;0045;I-471__(KY)| INCR;-1;I-71 
+                                                                                            "> I-71 at US-50 (Lytle Tunnel)    &emsp;&emsp;&emsp;&emsp;  1 </option>
+
+        <option value="CCTV;047;a;   || INCR;+1;(Tunnel) | CCTV;042;I-71 |                  "> I-71 cam 47 at Lytle Tunnel     &emsp;&emsp;&emsp;&emsp;  1 </option>
+        <option value="CCTV;046;a;   || INCR;+1;(Tunnel) | CCTV;042;I-71 | INCR;-1;(Tunnel) "> I-71 SB, West Tunnel, South End &emsp;&emsp;&emsp;&emsp;  1 </option>
+        <option value="CCTV;045;a;   || INCR;+1;(Tunnel) | CCTV;042;I-71 | INCR;-1;(Tunnel) "> I-71 NB, East Tunnel, North End &emsp;&emsp;&emsp;&emsp;  1 </option>
+        <option value="CCTV;043;a;   || INCR;+1;(Tunnel) | CCTV;042;I-71 | INCR;-1;(Tunnel) "> I-71 SB, West Tunnel, North End &emsp;&emsp;&emsp;&emsp;  1 </option>
+        <option value="CCTV;044;a;   || INCR;+1;(Tunnel) | CCTV;042;I-71 | INCR;-1;(Tunnel) "> I-71 cam 44 at Lytle Tunnel     &emsp;&emsp;&emsp;&emsp;  1 </option>
+        <option value="CCTV;048;a;   ||                  | CCTV;042;I-71 | INCR;-1;(Tunnel) "> I-71 cam 48 at Lytle Tunnel     &emsp;&emsp;&emsp;&emsp;  1 </option>
+
+        <option value="CCTV;037;a;   | INCR;+1;I-71     | KYTC;0180;Via__river |KYTC;0045;I-471__(KY)| CCTV;042;I-71    "> I-71 at I-471 (Van Meter St)    &emsp;&emsp;&emsp;&emsp;  1 </option>
+        <option value="ARTIMIS;;CCTV_I-71-Gilbert;
+                                     | INCR;+1;I-71 || INCR;-1;I-71 | "> I-71 at Casino, Gilbert Ave     &emsp;&emsp;&emsp;&emsp;  2 </option>
+        <option value="CCTV;036;a;-L | INCR;+1;I-71 || INCR;-1;I-71 | "> I-71 at Gilbert                 &emsp;&emsp;&emsp;&emsp;  2 </option>
+        <option value="CCTV;087;a;   | INCR;+1;I-71 || INCR;-1;I-71 | "> I-71 at McGregor Ave            &emsp;&emsp;&emsp;&emsp;  2 </option>
+        <option value="CCTV;086;a;   | INCR;+1;I-71 || INCR;-1;I-71 | CCTV;019;W.H.Taft__Rd 
+                                                                      "> I-71 at William Howard Taft     &emsp;&emsp;&emsp;&emsp;  2 </option>
+        <option value="CCTV;085;a;   | INCR;+1;I-71 || INCR;-1;I-71 | CCTV;018;MLK__Dr"> I-71 at Martin Luther King Dr   &emsp;&emsp;&emsp;&emsp;  3 </option>
+        <option value="CCTV;084;a;   | INCR;+1;I-71 || INCR;-1;I-71 | "> I-71 at N of Victory Pkwy       &emsp;&emsp;&emsp;&emsp;  4 </option>
+        <option value="CCTV;083;a;   | INCR;+1;I-71 || INCR;-1;I-71 | "> I-71 at Montgomery Rd           &emsp;&emsp;&emsp;&emsp;  4 </option>
+        <option value="CCTV;082;a;   | INCR;+1;I-71 || INCR;-1;I-71 | "> I-71 at Dana Ave                &emsp;&emsp;&emsp;&emsp;  5 </option>
+        <option value="CCTV;081;a;   | INCR;+1;I-71 || INCR;-1;I-71 | "> I-71 at Smith Rd                &emsp;&emsp;&emsp;&emsp;  6 </option>
+        <option value="CCTV;080;a;   | INCR;+1;I-71 || INCR;-1;I-71 | "> I-71 at Robertson Ave           &emsp;&emsp;&emsp;&emsp;  6 </option>
+        <option value="CCTV;079;a;   | INCR;+1;I-71 || INCR;-1;I-71 | ALPH;SR-562_at_West_of_Reading_Rd;SR-562 
+                                                                      "> I-71 at SR-562 (Norwood Lateral)&emsp;&emsp;&emsp;&emsp;  7 </option>
+        <option value="CCTV;078;a;-L | INCR;+1;I-71 || INCR;-1;I-71 | "> I-71 at Kennedy Ave             &emsp;&emsp;&emsp;&emsp;  8 </option>
+        <option value="CCTV;077;a;-L | INCR;+1;I-71 || INCR;-1;I-71 | "> I-71 at Red Bank Rd             &emsp;&emsp;&emsp;&emsp;  9 </option>
+        <option value="CCTV;076;a;   | INCR;+1;I-71 || INCR;-1;I-71 | "> I-71 at North of Stewart Rd     &emsp;&emsp;&emsp;&emsp; 10 </option>
+        <option value="CCTV;075;a;-L | INCR;+1;I-71 || INCR;-1;I-71 | "> I-71 at Euclid Ave              &emsp;&emsp;&emsp;&emsp; 11 </option>
+        <option value="CCTV;074;a;   | INCR;+1;I-71 | CCTV;038;US-22__curving__N | INCR;-1;I-71 | CCTV;010;US-22 
+                                                                      "> I-71 at Montgomery Rd (Kenwood) &emsp;&emsp;&emsp;&emsp; 12 </option>
+        <option value="CCTV;073;a;-L | INCR;+1;I-71 || INCR;-1;I-71 | CCTV;4159;SR-126 
+                                                                      "> I-71 at SR-126 (RRCC)           &emsp;&emsp;&emsp;&emsp; 14 </option>
+        <option value="CCTV;072;a;-L | INCR;+1;I-71 || INCR;-1;I-71 | CCTV;104;Pfeiffer 
+                                                                      "> I-71 at Pfeiffer Rd             &emsp;&emsp;&emsp;&emsp; 15 </option>
+        <option value="CCTV;071;a;   | INCR;+1;I-71 || INCR;-1;I-71 | "> I-71 at Deerfield Rd            &emsp;&emsp;&emsp;&emsp; 16 </option>
+        <option value="CCTV;041;a;-L | INCR;+1;I-71 | CCTV;038;I-275 | INCR;-1;I-71 | CCTV;039;I-275 
+                                                                      "> I-71 at I-275                   &emsp;&emsp;&emsp;&emsp; 17 </option>
+        <option value="CCTV;4157;;   | INCR;+1;I-71 || INCR;-1;I-71 | "> I-71 at S of Snider Rd          &emsp;&emsp;&emsp;&emsp; 18 </option>
+        <option value="CCTV;4158;;   | INCR;+1;I-71 || INCR;-1;I-71 | "> I-71 at N of Snider Rd          &emsp;&emsp;&emsp;&emsp; 18 </option>
+        <option value="FEMM;159;;    | INCR;+1;I-71 | FEMM;176;Fields-Ertel | INCR;-1;I-71 | FEMM;172;Fields-Ertel 
+                                                                      "> I-71 at Mason-Montgomery/Fields Ertel Rd &emsp;&emsp;&emsp;&emsp; 19 </option>
+        <option value="CCTV;4160;;   | INCR;+1;I-71 || INCR;-1;I-71 | "> I-71 at N of Fields Ertel Rd    &emsp;&emsp;&emsp;&emsp; 20 </option>
+        <option value="CINCI;;I-71_at_Socialville-Foster_Rd;
+                                     | INCR;+1;I-71 || INCR;-1;I-71 | "> I-71 at Socialville-Foster Rd   &emsp;&emsp;&emsp;&emsp; 24 </option>
+        <option value="CCTV;092;a;-L | INCR;+1;I-71 || INCR;-1;I-71 | "> I-71 at SR-741 / Kings Mills Rd &emsp;&emsp;&emsp;&emsp; 25 </option>
+        <option value="CCTV;4155;;   | INCR;+1;I-71 || INCR;-1;I-71 | "> I-71 at SR-48                   &emsp;&emsp;&emsp;&emsp; 28 </option>
+        <option value="CCTV;4156;;   | INCR;+1;I-71 || INCR;-1;I-71 | ALPH;../I-75_at_SR-63;SR-123/63 "> I-71 at SR-123                  &emsp;&emsp;&emsp;&emsp; 32 </option>
+        <option value="CINCI;;I-71_at_Jeremiah_Morrow_Bridge;
+                                     | INCR;+1;I-71 || INCR;-1;I-71 | "> I-71 at Jeremiah Morrow Bridge  &emsp;&emsp;&emsp;&emsp; 33 </option>
+        <option value="CCTV;4154;;   |              || INCR;-1;I-71 | ALPH;../Dayton/I-75_at_SR-73;SR-73 
+                                                                      "> I-71 at SR-73                   &emsp;&emsp;&emsp;&emsp; 45 </option>
+      </optgroup>
+
+      <optgroup label="I-74 (From west to east)" >
+                     <!-- +1 is East -->
+        <option value="CCTV;139;a; |                | INCR;+1;I-74/275 | CCTV;062;I-275 |  "> I-74 at Morgan Rd                 &emsp;&emsp;&emsp;&emsp;  4 </option>
+        <option value="CCTV;149;;  |                | INCR;+1;I-74/275__curving__N | CCTV;062;I-275 | INCR;-1;I-74 
+                                                                                           "> I-74 at Wesselman Rd              &emsp;&emsp;&emsp;&emsp;  9 </option>
+        <option value="CCTV;148;;  | CCTV;112;I-275__curving__E | ALPH;Colerain_Ave_at_SR-126_WB;SR-126 | INCR;+1;I-74 | INCR;-1;I-74/275__curving__S 
+                                                                                           "> I-74 at I-275 N                   &emsp;&emsp;&emsp;&emsp;  9 </option>
+        <option value="CCTV;147;;  | INCR;-1;I-74   | INCR;+1;I-74     ||                  "> I-74 at Harrison Ave              &emsp;&emsp;&emsp;&emsp; 11 </option>
+        <option value="CCTV;146;;  |                | INCR;+1;I-74     || INCR;-1;I-74     "> I-74 East of Harrison Ave         &emsp;&emsp;&emsp;&emsp; 12 </option>
+        <option value="CCTV;145;;  |                | INCR;+1;I-74     || INCR;-1;I-74     "> I-74 at Rybolt Rd                 &emsp;&emsp;&emsp;&emsp; 13 </option>
+        <option value="CCTV;144;;  |                | INCR;+1;I-74     || INCR;-1;I-74     "> I-74 at North Bend Rd             &emsp;&emsp;&emsp;&emsp; 14 </option>
+        <option value="CCTV;143;;  |                | INCR;+1;I-74     || INCR;-1;I-74     "> I-74 at Shepherd Creek Rd         &emsp;&emsp;&emsp;&emsp; 16 </option>
+        <option value="CCTV;142;;  |                | INCR;+1;I-74     || INCR;-1;I-74     "> I-74 at Montana Ave               &emsp;&emsp;&emsp;&emsp; 17 </option>
+        <option value="CCTV;141;;  | ALPH;US-27_at_Galbraith_Rd;US-27 
+                                                    | INCR;+1;I-74     || INCR;-1;I-74     "> I-74 at Colerain Ave / Beekman St &emsp;&emsp;&emsp;&emsp; 18 </option>
+        <option value="CCTV;140;;  |                | CCTV;049;I-75    || INCR;-1;I-74     "> I-74 at Elmore St                 &emsp;&emsp;&emsp;&emsp; 19 </option>
+      </optgroup>
+
+      <optgroup label="I-75 (From river northward)">
+                     <!-- +1 is North -->
+        <option value="CCTV;022;;    | INCR;+1;I-75 | CCTV;035;I-71 | KYTC;1911;I-71/75__(KY) | 
+                                                                      "> I-75 at 3rd St                   &emsp;&emsp;&emsp;&emsp;  1 </option>
+        <option value="CCTV;021;a;   | INCR;+1;I-75 || INCR;-1;I-75 | "> I-75 at 6th St                   &emsp;&emsp;&emsp;&emsp;  1 </option>
+        <option value="CCTV;091;a;-L | INCR;+1;I-75 || INCR;-1;I-75 | "> I-75 at Linn St                  &emsp;&emsp;&emsp;&emsp;  1 </option>
+        <option value="CCTV;020;a;-L | INCR;+1;I-75 || INCR;-1;I-75 | "> I-75 at Ezzard Charles Dr        &emsp;&emsp;&emsp;&emsp;  1 </option>
+        <option value="CCTV;019;a;-L | INCR;+1;I-75 | CCTV;086;McMillan__St | INCR;-1;I-75 | "> I-75 at Western Hills Viaduct    &emsp;&emsp;&emsp;&emsp;  2 </option>
+        <option value="ARTIMIS;;I-75_S_of_Hopple;
+                                     | INCR;+1;I-75 || INCR;-1;I-75 | "> I-75 at S of Hopple St           &emsp;&emsp;&emsp;&emsp;  3 </option>
+        <option value="CCTV;018;a;   | INCR;+1;I-75 | CCTV;085;Hopple__St | INCR;-1;I-75 | 
+                                                                      "> I-75 at Hopple St                &emsp;&emsp;&emsp;&emsp;  4 </option>
+        <option value="ARTIMIS;;I-75_N_of_Hopple;
+                                     | INCR;+1;I-75 || INCR;-1;I-75 | "> I-75 at N of Hopple St           &emsp;&emsp;&emsp;&emsp;  4 </option>
+        <option value="CCTV;093;a;-L | INCR;+1;I-75 || INCR;-1;I-75 | "> I-75 South of I-74               &emsp;&emsp;&emsp;&emsp;  4 </option>
+        <option value="CCTV;049;a;-L | INCR;+1;I-75 || INCR;-1;I-75 | CCTV;140;I-74
+                                                                      "> I-75 at I-74                     &emsp;&emsp;&emsp;&emsp;  4 </option>
+        <option value="CCTV;016;a;   | INCR;+1;I-75 || INCR;-1;I-75 | "> I-75 at N of I-74                &emsp;&emsp;&emsp;&emsp;  5 </option>
+        <option value="CINCI;;I-75_at_Clifton_Ave;
+                                     | INCR;+1;I-75 || INCR;-1;I-75 | "> I-75 at Clifton Ave              &emsp;&emsp;&emsp;&emsp;  6 </option>
+        <option value="CCTV;015;a;   | INCR;+1;I-75 || INCR;-1;I-75 | "> I-75 at Mitchell Ave             &emsp;&emsp;&emsp;&emsp;  6 </option>
+        <option value="CCTV;014;a;   | INCR;+1;I-75 || INCR;-1;I-75 | "> I-75 at North of Mitchell Ave    &emsp;&emsp;&emsp;&emsp;  6 </option>
+        <option value="ARTIMIS;;I-75_at_Vine_St;
+                                     | INCR;+1;I-75 || INCR;-1;I-75 | "> I-75 at Vine St                  &emsp;&emsp;&emsp;&emsp;  6 </option>
+        <option value="ARTIMIS;;I-75_at_SR-562;
+                                     | INCR;+1;I-75 | ALPH;SR-562_at_East_of_I-75;SR-562 | INCR;-1;I-75 | "> I-75 at SR-562 (Norwood Lateral) &emsp;&emsp;&emsp;&emsp;  7 </option>
+        <option value="CCTV;011;a;-L | INCR;+1;I-75 || INCR;-1;I-75 | "> I-75 at N of Towne St            &emsp;&emsp;&emsp;&emsp;  9 </option>
+        <option value="CCTV;010;a;-L | INCR;+1;I-75 | CCTV;074;Section__Rd | INCR;-1;I-75 | "> I-75 at N of Paddock Rd          &emsp;&emsp;&emsp;&emsp;  9 </option>
+        <option value="CCTV;009;a;-L | INCR;+1;I-75 | CCTV;4159;SR-126 | INCR;-1;I-75 | ALPH;Colerain_Ave_at_SR-126_WB;SR-126 
+                                                                      "> I-75 at SR-126 (RRCC)            &emsp;&emsp;&emsp;&emsp; 10 </option>
+        <option value="CCTV;008;a;-L | INCR;+1;I-75 || INCR;-1;I-75 | "> I-75 SB at N of Galbraith Rd     &emsp;&emsp;&emsp;&emsp; 11 </option>
+        <option value="CCTV;007;a;-L | INCR;+1;I-75 || INCR;-1;I-75 | "> I-75 NB at Davis St              &emsp;&emsp;&emsp;&emsp; 12 </option>
+        <option value="CCTV;006;a;-L | INCR;+1;I-75 || INCR;-1;I-75 | "> I-75 at Lockland Split           &emsp;&emsp;&emsp;&emsp; 12 </option>
+        <option value="CCTV;005;a;-L | INCR;+1;I-75 || INCR;-1;I-75 | "> I-75 at Neumann Way              &emsp;&emsp;&emsp;&emsp; 13 </option>
+        <option value="CCTV;104;a;-L | INCR;+1;I-75 | CCTV;072;Glendale-Milford | INCR;-1;I-75 | 
+                                                                      "> I-75 at Glendale-Milford Rd      &emsp;&emsp;&emsp;&emsp; 14 </option>
+        <option value="CCTV;004;a;-L | INCR;+1;I-75 || INCR;-1;I-75 | "> I-75 at Sharon Rd                &emsp;&emsp;&emsp;&emsp; 15 </option>
+        <option value="CCTV;002;a;-L | INCR;+1;I-75 | CCTV;101;I-275 | INCR;-1;I-75 | CCTV;003;I-275 
+                                                                      "> I-75 at I-275 (N)                &emsp;&emsp;&emsp;&emsp; 16 </option>
+        <option value="CCTV;066;a;-L | INCR;+1;I-75 || INCR;-1;I-75 | "> I-75 at Allen Rd                 &emsp;&emsp;&emsp;&emsp; 18 </option>
+        <option value="CINCI;;I-75_at_Union_Centre_Blvd;
+                                     | INCR;+1;I-75 || INCR;-1;I-75 | "> I-75 at Union Centre Blvd        &emsp;&emsp;&emsp;&emsp; 20 </option>
+        <option value="CCTV;068;a;   | INCR;+1;I-75 || INCR;-1;I-75 | "> I-75 at Cin-Day                  &emsp;&emsp;&emsp;&emsp; 21 </option>
+        <option value="CCTV;069;a;-L | INCR;+1;I-75 || INCR;-1;I-75 | ALPH;SR-747_Tylersville_North;Tylersville 
+                                                                      "> I-75 at Tylersville Rd           &emsp;&emsp;&emsp;&emsp; 22 </option>
+        <option value="CCTV;070;a;-L | INCR;+1;I-75 || INCR;-1;I-75 | "> I-75 at Liberty Way              &emsp;&emsp;&emsp;&emsp; 24 </option>
+        <option value="ARTIMIS;;Liberty_Way_at_I-75SB_Ramp;
+                                     | INCR;+1;I-75 || INCR;-1;I-75 | "> Liberty Way at I-75 SB Ramp      &emsp;&emsp;&emsp;&emsp; 24 </option>
+        <option value="ARTIMIS;;../I-75_at_Kyle_Station_Rd;
+                                     | INCR;+1;I-75 || INCR;-1;I-75 | "> I-75 at Kyle Station Rd          &emsp;&emsp;&emsp;&emsp; 27 </option>
+        <option value="ARTIMIS;;../rest_area/I-75_Butler_NB;
+                                     | INCR;+1;I-75 || INCR;-1;I-75 | "> I-75 NB Butler county rest area  &emsp;&emsp;&emsp;&emsp; 28 </option>
+        <option value="ARTIMIS;;../rest_area/I-75_Butler_SB;
+                                     | INCR;+1;I-75 || INCR;-1;I-75 | "> I-75 SB Butler county rest area  &emsp;&emsp;&emsp;&emsp; 28 </option>
+        <option value="ARTIMIS;;../I-75_at_SR-63;
+                                     | INCR;+1;I-75 | CCTV;4156;SR-63/123 | INCR;-1;I-75 | 
+                                                                      "> I-75 at SR-63                    &emsp;&emsp;&emsp;&emsp; 29 </option>
+        <option value="ARTIMIS;;../I-75_at_SR-122;
+                                     | INCR;+1;I-75 || INCR;-1;I-75 | "> I-75 at SR-122                   &emsp;&emsp;&emsp;&emsp; 32 </option>
+        <option value="ARTIMIS;;../Dayton/I-75_at_SR-73;
+                                     |              | CCTV;4154;SR-73 | INCR;-1;I-75 | 
+                                                                      "> I-75 at SR-73                    &emsp;&emsp;&emsp;&emsp; 38 </option>
+      </optgroup>
+
+      <optgroup label="I-71/75 (From river southward)">
+                     <!-- +1 is South -->
+        <option value="KYTC;1911;06;75 | CCTV;022;I-75__(OH) | CCTV;022;I-71__(OH) | INCR;+1;I-71/75 | 
+                                                                              "> I-71/I-75 N on Brent Spence Bridge &emsp;&emsp;&emsp;&emsp; 191.1 </option>
+        <option value="KYTC;1908;06;75 | INCR;-1;I-71/75 || INCR;+1;I-71/75 | "> I-71/I-75 at 12th St               &emsp;&emsp;&emsp;&emsp; 190.8 </option>
+        <option value="KYTC;1896;06;75 | INCR;-1;I-71/75 || INCR;+1;I-71/75 | "> I-71/I-75 at Cut in the Hill       &emsp;&emsp;&emsp;&emsp; 189.6 </option>
+        <option value="KYTC;1886;06;75 | INCR;-1;I-71/75 || INCR;+1;I-71/75 | "> I-71/I-75 at Kyles Ln              &emsp;&emsp;&emsp;&emsp; 188.6 </option>
+        <option value="KYTC;1877;06;75 | INCR;-1;I-71/75 || INCR;+1;I-71/75 | "> I-71/I-75 at Dixie Hwy             &emsp;&emsp;&emsp;&emsp; 187.7 </option>
+        <option value="KYTC;1868;06;75 | INCR;-1;I-71/75 || INCR;+1;I-71/75 | "> I-71/I-75 at N of Buttermilk Pike  &emsp;&emsp;&emsp;&emsp; 186.8 </option>
+        <option value="KYTC;1863;06;75 | INCR;-1;I-71/75 || INCR;+1;I-71/75 | "> I-71/I-75 at Buttermilk Pike       &emsp;&emsp;&emsp;&emsp; 186.3 </option>
+        <option value="KYTC;1847;06;75 | INCR;-1;I-71/75 | KYTC;0823;I-275 | INCR;+1;I-71/75 | KYTC;0020;I-275 
+                                                                              "> I-71/I-75 at I-275                 &emsp;&emsp;&emsp;&emsp; 184.7 </option>
+        <option value="KYTC;1838;06;75 | INCR;-1;I-71/75 || INCR;+1;I-71/75 | "> I-71/I-75 at Donaldson Hwy         &emsp;&emsp;&emsp;&emsp; 183.8 </option>
+        <option value="KYTC;1823;06;75 | INCR;-1;I-71/75 || INCR;+1;I-71/75 | "> I-71/I-75 at Turfway Rd            &emsp;&emsp;&emsp;&emsp; 182.3 </option>
+        <option value="KYTC;1812;06;75 | INCR;-1;I-71/75 || INCR;+1;I-71/75 | "> I-71/I-75 at Burlington Pike       &emsp;&emsp;&emsp;&emsp; 181.2 </option>
+        <option value="KYTC;1801;06;75 | INCR;-1;I-71/75 || INCR;+1;I-71/75 | "> I-71/I-75 at US-42                 &emsp;&emsp;&emsp;&emsp; 180.1 </option>
+        <option value="KYTC;1781;06;75 | INCR;-1;I-71/75 || INCR;+1;I-71/75 | "> I-71/I-75 at Mt. Zion Rd           &emsp;&emsp;&emsp;&emsp; 178.1 </option>
+        <option value="KYTC;1758;06;75 | INCR;-1;I-71/75 || INCR;+1;I-71/75 | "> I-71/I-75 north of Richwood Rd     &emsp;&emsp;&emsp;&emsp; 175.8 </option>
+        <option value="KYTC;1725;06;75 | INCR;-1;I-71/75 || INCR;+1;I-71    | "> I-71/I-75 KY Split                 &emsp;&emsp;&emsp;&emsp; 172.5 </option>
+        <option value="KYTC;0770;06;71 | INCR;-1;I-71/75 || INCR;+1;I-71    | "> I-71/I-75                          &emsp;&emsp;&emsp;&emsp;  77.0 </option>
+        <option value="KYTC;0739;06;71 | INCR;-1;I-71    || INCR;+1;I-71    | "> I-71 SB at the 73.9 MM             &emsp;&emsp;&emsp;&emsp;  73.9 </option>
+        <option value="KYTC;0669;06;71 | INCR;-1;I-71    ||                 | "> I-71 SB at the 66.9 MM             &emsp;&emsp;&emsp;&emsp;  66.9 </option>
+      </optgroup>
+
+      <optgroup label="I-275 (Clockwise)">
+                     <!-- Along I-275, +1 changes as the road curves, be careful -->
+        <!-- Indiana -->
+        <option value="CCTV;063;;    | CCTV;062;I-275__(OH) || KYTC;0128;I-275__(KY) | 
+                                                                        "> I-275 at US-50, Indiana           &emsp;&emsp;&emsp;&emsp; 16 </option>
+
+        <!-- Ohio -->
+                     <!-- At Indiana line, clockwise is North -->
+        <option value="CCTV;062;;    || CCTV;149;I-74/275__(OH) | CCTV;063;I-275__(IN) | CCTV;139;I-74
+                                                                        "> I-275 at US-50 Underpass, Ohio    &emsp;&emsp;&emsp;&emsp;  1 </option>
+
+        <option value="CCTV;112;a;   | ALPH;Colerain_Ave_at_I-275_WB;US-27 | INCR;+2;I-275 | ALPH;Colerain_Ave_at_I-275_EB;US-27 | CCTV;148;I-275 "> I-275 at Colerain Ave / US-27     &emsp;&emsp;&emsp;&emsp; 33 </option>
+
+                     <!-- Clockwise changing to East    -->
+                     <!-- Tricky triplet for exit ramps -->
+        <option value="ARTIMIS;;US-127_at_I-275_EB_Ramp; | INCR;+1;I-275 ||| 
+                                                                        "> US-127 / Hamilton Ave at I-275 EB Ramp                        </option>
+        <option value="CCTV;098;a;   | INCR;+1;US-127 | INCR;+2;I-275 | INCR;-1;US-127 | INCR;-2;I-275 
+                                                                        "> I-275 at Hamilton Ave / US-127    &emsp;&emsp;&emsp;&emsp; 36 </option>
+        <option value="ARTIMIS;;US-127_I-275_WB_Ramp; ||| INCR;-1;I-275 | 
+                                                                        "> US-127 / Hamilton Ave at I-275 WB Ramp                        </option>
+
+        <option value="CCTV;108;a;   || INCR;+1;I-275 || INCR;-2;I-275  "> I-275 at Winton Rd                &emsp;&emsp;&emsp;&emsp; 39 </option>
+
+        <option value="CCTV;040;a;-L || INCR;+1;I-275 || INCR;-1;I-275  "> I-275 at SR-4                     &emsp;&emsp;&emsp;&emsp; 41 </option>
+        <option value="CCTV;003;a;   | ALPH;SR747-Union;SR-747 | CCTV;002;I-275 || INCR;-1;I-275 
+                                                                        "> I-275 at SR-747                   &emsp;&emsp;&emsp;&emsp; 42 </option>
+        <option value="CCTV;101;a;   || INCR;+1;I-275 || CCTV;002;I-275 "> I-275 at Mosteller Rd             &emsp;&emsp;&emsp;&emsp; 44 </option>
+        <option value="CCTV;001;a;-L || INCR;+1;I-275 || INCR;-1;I-275  "> I-275 at US-42                    &emsp;&emsp;&emsp;&emsp; 46 </option>
+        <option value="CCTV;039;a;-L || CCTV;041;I-275|| INCR;-1;I-275  "> I-275 at Reed Hartman Highway     &emsp;&emsp;&emsp;&emsp; 47 </option>
+
+        <option value="CCTV;038;a;-L | FEMM;183;US-22 | INCR;+1;I-275__curving__S | CCTV;074;US-22__curving__W | CCTV;041;I-275 
+                                                                        "> I-275 at Montgomery Rd            &emsp;&emsp;&emsp;&emsp; 50 </option>
+
+                     <!-- Clockwise changing to South   -->
+        <option value="CCTV;107;a;-L ||| INCR;+1;I-275 | INCR;-1;I-275  "> I-275 at E of Loveland-Madeira Rd &emsp;&emsp;&emsp;&emsp; 52 </option>
+
+        <option value="ARTIMIS;;SR-28_at_I-275_NB; | INCR;-1;I-275__curving__W | INCR;+1;SR-28 | INCR;+2;I-275 |
+                                                                        "> SR-28 at I-275 NB Ramp            &emsp;&emsp;&emsp;&emsp; 57 </option>
+        <option value="ARTIMIS;;SR-28_at_Old_28; |||| INCR;-1;SR-28     "> SR-28 at Old 28 East                                           </option>
+
+        <option value="CCTV;105;a;-L | INCR;-2;I-275 || INCR;+1;I-275 | "> I-275 at SR-131                   &emsp;&emsp;&emsp;&emsp; 58 </option>
+        <option value="CCTV;109;a;-L | INCR;-1;I-275 | ALPH;SR-32_at_Glen-Este-Withamsville_Rd;SR-32 | INCR;+1;I-275 | 
+                                                                        "> I-275 at SR-32                    &emsp;&emsp;&emsp;&emsp; 63 </option>
+        <option value="CCTV;4152;;   | INCR;-1;I-275 | ALPH;SR-125_at_I-275_NB;SR-125 | INCR;+1;I-275__curving__W | ALPH;SR-125_at_I-275_SB;SR-125 
+                                                                        "> I-275 at SR-125                   &emsp;&emsp;&emsp;&emsp; 65 </option>
+                     <!-- Clockwise changing to West    -->
+        <option value="CCTV;4151;;   | ALPH;SR-125_at_Eight_Mile;Eight__Mile | INCR;-1;I-275__curving__N || INCR;+1;I-275 
+                                                                        "> I-275 at Eight Mile Rd            &emsp;&emsp;&emsp;&emsp; 67 </option>
+        <option value="CCTV;4150;;   | ALPH;SR-125_Five_Mile_East;Five__Mile | INCR;-1;I-275 || INCR;+1;I-275 
+                                                                        "> I-275 at Five Mile Rd             &emsp;&emsp;&emsp;&emsp; 69 </option>
+        <option value="CCTV;4111;;   || INCR;-1;I-275 || INCR;+1;I-275  "> I-275 at US-52                    &emsp;&emsp;&emsp;&emsp; 71 </option>
+        <option value="CCTV;4110;-5; || INCR;-1;I-275 || INCR;+1;I-275  "> I-275 at East of Kellogg Ave      &emsp;&emsp;&emsp;&emsp; 71 </option>
+        <option value="CCTV;110;a;-L || INCR;-1;I-275__(OH) ||  INCR;+1;I-275__(KY) 
+                                                                        "> I-275 at Kellogg Ave              &emsp;&emsp;&emsp;&emsp; 72 </option>
+
+        <!-- Kentucky -->
+                     <!-- Clockwise is still West -->
+        <option value="KYTC;0741;06;275 || INCR;-1;I-275__(OH) || INCR;+1;I-275__(KY) "> I-275 at US-27 Overpass         &emsp;&emsp;&emsp;&emsp; 74.1 </option>
+        <option value="KYTC;0748;06;275 | KYTC;0006;I-471 | INCR;-1;I-275 || INCR;+1;I-275 
+                                                                          "> I-275 at I-471                  &emsp;&emsp;&emsp;&emsp; 74.8 </option>
+        <option value="KYTC;0762;06;275 || INCR;-1;I-275 || INCR;+1;I-275 "> I-275 East of Johns Hill Road   &emsp;&emsp;&emsp;&emsp; 76.2 </option>
+        <option value="KYTC;0788;06;275 || INCR;-1;I-275 || INCR;+1;I-275 "> I-275 at Taylor Mill            &emsp;&emsp;&emsp;&emsp; 78.8 </option>
+        <option value="KYTC;0812;06;275 || INCR;-1;I-275 || INCR;+1;I-275 "> I-275 East of Turkeyfoot Road   &emsp;&emsp;&emsp;&emsp; 81.2 </option>
+        <option value="KYTC;0823;06;275 || INCR;-1;I-275 || KYTC;1847;I-275 
+                                                                          "> I-275 at Dixie Hwy              &emsp;&emsp;&emsp;&emsp; 82.3 </option>
+
+        <option value="KYTC;0020;06;275 || KYTC;1847;I-275 || INCR;+1;I-275 
+                                                                          "> I-275 at Mineola Pike           &emsp;&emsp;&emsp;&emsp;  2.0 </option>
+        <option value="KYTC;0037;06;275 || INCR;-1;I-275 || INCR;+1;I-275 "> I-275 East of KY 212/Airport    &emsp;&emsp;&emsp;&emsp;  3.7 </option>
+        <option value="KYTC;0048;06;275 || INCR;-1;I-275 || INCR;+1;I-275 "> I-275 at Petersburg Rd Overpass &emsp;&emsp;&emsp;&emsp;  4.8 </option>
+        <option value="KYTC;0060;06;275 || INCR;-1;I-275 || INCR;+1;I-275 "> I-275 East of KY 237            &emsp;&emsp;&emsp;&emsp;  6.0 </option>
+        <option value="KYTC;0070;06;275 || INCR;-1;I-275 || INCR;+1;I-275 "> I-275 at KY 237                 &emsp;&emsp;&emsp;&emsp;  7.0 </option>
+        <option value="KYTC;0089;06;275 || INCR;-1;I-275 || INCR;+1;I-275 "> I-275 West of KY 237            &emsp;&emsp;&emsp;&emsp;  8.9 </option>
+        <option value="KYTC;0116;06;275 || INCR;-1;I-275 || INCR;+1;I-275 "> I-275 at KY 8/Petersburg Exit   &emsp;&emsp;&emsp;&emsp; 11.6 </option>
+                     <!-- Clockwise changing to North   -->
+        <option value="KYTC;0128;06;275 | CCTV;063;I-275__(IN) | INCR;-1;I-275__(KY) || 
+                                                                          "> I-275 East of KY/IN Border      &emsp;&emsp;&emsp;&emsp; 12.8 </option>
+      </optgroup>
+
+      <optgroup label="I-471 (From I-275 northward to river)">
+                     <!-- +1 is North -->
+        <option value="KYTC;0006;06;471 | INCR;+1;I-471       || KYTC;0748;I-275 | "> I-471 NB just N of I-275          &emsp;&emsp;&emsp;&emsp; 0.6 </option>
+        <option value="KYTC;0014;06;471 | INCR;+1;I-471       || INCR;-1;I-471   | "> I-471 South of US-27              &emsp;&emsp;&emsp;&emsp; 1.4 </option>
+        <option value="KYTC;0023;06;471 | INCR;+1;I-471       || INCR;-1;I-471   | "> I-471 SB at Highland Ave Overpass &emsp;&emsp;&emsp;&emsp; 2.3 </option>
+        <option value="KYTC;0027;06;471 | INCR;+1;I-471       || INCR;-1;I-471   | "> I-471 at Grand Ave                &emsp;&emsp;&emsp;&emsp; 2.7 </option>
+        <option value="KYTC;0045;06;471 | CCTV;037;I-71__(OH) || INCR;-1;I-471   | CCTV;042;I-71__(OH) 
+                                                                                   "> I-471 SB just S of Ky Rt 8        &emsp;&emsp;&emsp;&emsp; 4.5 </option>
+      </optgroup>
+
+      <optgroup label="US-27 (Colerain Ave) south to north">
+                     <!-- +1 is North -->
+        <option value="ARTIMIS;;US-27_at_Galbraith_Rd;       | INCR;+1;US-27 || CCTV;141;US-27 | "> US-27 / Colerain Ave at Galbraith Rd    </option>
+        <option value="ARTIMIS;;US-27_at_Colerain_Crossings; | INCR;+1;US-27 || INCR;-1;US-27  | "> US-27 / Colerain Ave at South of SR-126 </option>
+        <option value="ARTIMIS;;Colerain_Ave_at_SR-126_EB;   | INCR;+1;US-27 || INCR;-1;US-27  | "> Colerain Ave at SR-126 EB               </option>
+        <option value="ARTIMIS;;Colerain_Ave_at_SR-126_WB;   | INCR;+1;US-27 | CCTV;009;SR-126 | INCR;-1;US-27 | CCTV;148;SR-126 
+                                                                                                 "> Colerain Ave at SR-126 WB Ramp  </option>
+        <option value="ARTIMIS;;joseph227;                   | INCR;+1;US-27 || INCR;-1;US-27  | "> US-27 at Joseph                         </option>
+        <option value="ARTIMIS;;poole211;                    | INCR;+1;US-27 || INCR;-1;US-27  | "> US-27 at Poole Rd                       </option>
+        <option value="ARTIMIS;;compton195;                  | INCR;+1;US-27 || INCR;-1;US-27  | "> US-27 / Colerain Ave at Compton Rd      </option>
+        <option value="ARTIMIS;;roundtop179;                 | INCR;+1;US-27 || INCR;-1;US-27  | "> US-27 at Roundtop Rd                    </option>
+        <option value="ARTIMIS;;Colerain_Ave_at_Springdale;  | INCR;+1;US-27 || INCR;-1;US-27  | "> Colerain Ave at Springdale Rd           </option>
+        <option value="ARTIMIS;;Colerain_Ave_at_I-275_EB;    | CCTV;112;I-275|| INCR;-1;US-27  | "> Colerain Ave at I-275 EB Ramp      </option>
+        <option value="ARTIMIS;;Colerain_Ave_at_I-275_WB;    | INCR;+1;US-27 || CCTV;112;I-275 | "> Colerain Ave at I-275 WB Ramp      </option>
+        <option value="ARTIMIS;;US-27_Raeann;                |               || INCR;-1;US-27  | "> US-27/Colerain Ave at Raeann Dr         </option>
+      </optgroup>
+
+      <optgroup label="SR-32 (Eastgate)">
+                     <!-- +1 is East -->
+        <option value="ARTIMIS;;SR-32_at_Glen-Este-Withamsville_Rd; || INCR;+1;SR-32 | ALPH;withamsville3;Glen__Es-Wi| CCTV;109;SR-32 "> SR-32 at Glen Este-Withamsville Rd </option>
+        <option value="ARTIMIS;;SR-32_at_Bach_Buxton_Rd;            || INCR;+1;SR-32 || INCR;-1;SR-32 "> SR-32 at Elick Ln/Bach Buxton Rd   </option>
+        <option value="ARTIMIS;;SR-32_at_Old_SR-74_E;               |||| INCR;-1;SR-32 "> SR-32 at Old SR-74 East            </option>
+      </optgroup>
+
+      <optgroup label="SR-125 (Beechmont)">
+                     <!-- +1 is East -->
+        <option value="ARTIMIS;;SR-125_Five_Mile_North;    ||| INCR;+3;Quad-View | "> SR-125 at Five Mile Rd, Looking North </option>
+        <option value="ARTIMIS;;SR-125_Five_Mile_West;     || INCR;+2;Quad-View || "> SR-125 at Five Mile Rd, Looking West  </option>
+        <option value="ARTIMIS;;SR-125_Five_Mile_South;    | INCR;+1;Quad-View ||| "> SR-125 at Five Mile Rd, Looking South </option>
+
+        <option value="ARTIMIS;;SR-125_Five_Mile_Quad;     | INCR;-3;Zoom_N | INCR;+2;Zoom_E | INCR;-1;Zoom_S | INCR;-2;Zoom_W 
+                                                                                   "> SR-125 at Five Mile Rd (Quad View)    </option>
+
+        <option value="ARTIMIS;;SR-125_Five_Mile_East;     || INCR;+1;SR-125 | CCTV;4150;Five__Mile | INCR;-1;Quad-View 
+                                                                                   "> SR-125 at Five Mile Rd, Looking East  </option>
+
+        <option value="ARTIMIS;;wolfangel19;               || INCR;+1;SR-125 || INCR;-1;SR-125 "> SR-125 at Wolfangel Rd                </option>
+        <option value="ARTIMIS;;asbury3;                   || INCR;+1;SR-125 || INCR;-1;SR-125 "> SR-125 at Asbury Rd                   </option>
+        <option value="ARTIMIS;;SR-125_Nagel;              || INCR;+1;SR-125 || INCR;-1;SR-125 "> SR-125 at Nagel Rd                    </option>
+        <option value="ARTIMIS;;SR-125_at_Eight_Mile;      || INCR;+1;SR-125 | CCTV;4151;Eight__Mile | INCR;-1;SR-125 
+                                                                                               "> SR-125 at Eight Mile                  </option>
+        <option value="ARTIMIS;;nordyke179;                || INCR;+1;SR-125 || INCR;-1;SR-125 "> SR-125 at Nordyke Rd                  </option>
+        <option value="ARTIMIS;;Cherry163;                 || INCR;+1;SR-125 || INCR;-1;SR-125 "> SR-125 at Cherry Grove                </option>
+        <option value="ARTIMIS;;independence131;           || INCR;+1;SR-125 || INCR;-1;SR-125 "> SR-125 at Independence Dr             </option>
+        <option value="ARTIMIS;;tobasco115;                || INCR;+1;SR-125 || INCR;-1;SR-125 "> SR-125 at Mt. Carmel/Tobasco Rd       </option>
+        <option value="ARTIMIS;;SR-125_at_I-275_SB;        ||CCTV;4152;SR-125|| INCR;-1;SR-125 "> SR-125 at I-275 SB Ramp               </option>
+        <option value="ARTIMIS;;SR-125_at_I-275_NB;        || INCR;+1;SR-125 ||CCTV;4152;SR-125"> SR-125 at I-275 NB Ramp               </option>
+        <option value="ARTIMIS;;9mile67;                   || INCR;+1;SR-125 || INCR;-1;SR-125 "> SR-125 at Nine Mile/Tobasco Rd        </option>
+        <option value="ARTIMIS;;britton51;                 || INCR;+1;SR-125 || INCR;-1;SR-125 "> SR-125 at Britton Blvd                </option>
+        <option value="ARTIMIS;;SR-125_at_Brandychase_Way; || INCR;+1;SR-125 || INCR;-1;SR-125 "> SR-125 at Brandychase Way             </option>
+        <option value="ARTIMIS;;withamsville3;             | ALPH;SR-32_at_Glen-Este-Withamsville_Rd;Glen__Es-Wi| INCR;+1;SR-125 || INCR;-1;SR-125 
+                                                                                               "> SR-125 at Glen Este-Withamsville Rd   </option>
+        <option value="ARTIMIS;;SR-125_at_Bennett_Rd;      || INCR;+1;SR-125 || INCR;-1;SR-125 "> SR-125 at Bennett Rd                  </option>
+        <option value="ARTIMIS;;SR-125_Bach_Buxton;        ||                || INCR;-1;SR-125 "> SR-125 at Bach Buxton Rd              </option>
+      </optgroup>
+
+      <optgroup label="SR-126 (Cross-County)">
+        <option value="CCTV;4159;; || CCTV;073;SR-126 || CCTV;009;SR-126 "> SR-126 at E of Plainfield Rd    &emsp;&emsp;&emsp;&emsp; 31 </option>
+      </optgroup>
+
+      <optgroup label="SR-562 (Norwood Lateral)">
+                     <!-- +1 is East -->
+        <option value="ARTIMIS;;SR-562_at_East_of_I-75;       || INCR;+1;SR-562  || ALPH;I-75_at_SR-562;SR-562 "> SR-562 at East of I-75       </option>
+        <option value="ARTIMIS;;SR-562_at_Paddock_Rd;         || INCR;+1;SR-562  || INCR;-1;SR-562             "> SR-562 at Paddock Rd         </option>
+        <option value="ARTIMIS;;SR-562_at_West_of_Reading_Rd; || CCTV;079;SR-562 || INCR;-1;SR-562             "> SR-562 at West of Reading Rd </option>
+      </optgroup>
+
+      <optgroup label="SR-747 (Princeton Pike)">
+                     <!-- +1 is South -->
+        <option value="ARTIMIS;;747_129_WB_Ramp;          |                || INCR;+1;SR-747  | "> SR-747 at SR-129 WB Ramp                </option>
+        <option value="ARTIMIS;;SR747-SR129EB;            | INCR;-1;SR-747 || INCR;+1;SR-747  | "> SR-747 at SR-129 EB Ramp                </option>
+
+        <option value="ARTIMIS;;SR-747_Tylersville_North; | INCR;-1;SR-747 | CCTV;069;Tylersville | INCR;+5;SR-747 | INCR;+1;Quad_View 
+                                                                                  "> SR-747 at Tylersville Rd, Looking East  </option>
+
+        <option value="ARTIMIS;;SR-747_Tylersville_Quad;  | INCR;+3;Zoom_N | INCR;-1;Zoom_E | INCR;+1;Zoom_S | INCR;+2;Zoom_W 
+                                                                                  "> SR-747 at Tylersville Rd (Quad view)    </option>
+
+        <option value="ARTIMIS;;SR-747_Tylersville_East;  | INCR;-1;Quad_View ||| "> SR-747 at Tylersville Rd, Looking South </option>
+        <option value="ARTIMIS;;SR-747_Tylersville_South  || INCR;-2;Quad_View || "> SR-747 at Tylersville Rd, Looking West  </option>
+        <option value="ARTIMIS;;SR-747_Tylersville_West;  ||| INCR;-3;Quad_View | "> SR-747 at Tylersville Rd, Looking North </option>
+
+        <option value="ARTIMIS;;747_Hutzleman;            | INCR;-5;SR-747 || INCR;+1;SR-747  | "> SR-747 at Hutzelman Way                 </option>
+        <option value="ARTIMIS;;SR747-Union;              | INCR;-1;SR-747 || CCTV;003;SR-747 | "> SR-747 at Union Centre Blvd             </option>
+      </optgroup>
+
+      <optgroup label="Fields-Ertel / Mason-Montgomery">
+                     <!-- +1 is random -->
+        <option value="FEMM;169;; |                           || FEMM;167;Mason-Montgomery | "> Mason Montgomery Rd &amp; Irwin Simpson Rd     </option>
+        <option value="FEMM;167;; | FEMM;169;Mason-Montgomery || FEMM;164;Mason-Montgomery | "> Mason Montgomery Rd &amp; Parkway Dr           </option>
+        <option value="FEMM;164;; | FEMM;167;Mason-Montgomery || FEMM;183;Mason-Montgomery | FEMM;172;Escort Dr 
+                                                                                             "> Mason Montgomery Rd &amp; I-71 SB Off Ramp </option>
+        <option value="FEMM;172;; | FEMM;164;Escort Dr        | FEMM;159;Fields-Ertel     || "> Fields Ertel Rd &amp; Escort Dr / I-71 On Ramp </option>
+        <option value="FEMM;183;; | FEMM;164;Mason-Montgomery | FEMM;182;US-22            | CCTV;038;US-22 | 
+                                                                                             "> Mason Rd &amp; Montgomery Rd (US-22)           </option>
+        <option value="FEMM;182;; | INCR;+1;US-22 || FEMM;183;US-22 | FEMM;178;Fields-Ertel  "> Fields Ertel Rd &amp; Montgomery Rd (US-22)    </option>
+        <option value="ARTIMIS;;US-22_Columbia;; ||| FEMM;182;US-22 |                        "> US-22 at Columbia Rd                           </option>
+
+        <option value="FEMM;176;; || FEMM;178;Fields-Ertel    || FEMM;159;Fields-Ertel       "> Fields Ertel Rd &amp; Kings Auto Mall          </option>
+        <option value="FEMM;178;; || FEMM;182;Fields-Ertel    || FEMM;176;Fields-Ertel       "> Fields Ertel Rd &amp; Union Cemetary Rd        </option>
+
+      </optgroup>
+
+      <optgroup label="US-68 (Maysville)">
+        <option value="KYTC;0180;09;US68 |||| CCTV;037;Via__river "> US 68 @ Ohio River Brdg Maysville 18.0 </option>
+      </optgroup>
+
+      <optgroup label="???">
+        <option value="CCTV;000;a;-L "> Artimis CCTV Camera 000 </option>
+        <option value="CCTV;012;a;-L "> Artimis CCTV Camera 012 </option>
+        <option value="CCTV;013;a;-L "> Artimis CCTV Camera 013 </option>
+        <option value="CCTV;017;a;-L "> Artimis CCTV Camera 017 </option>
+        <option value="CCTV;023;a;-L "> Artimis CCTV Camera 023 </option>
+        <option value="CCTV;024;a;-L "> Artimis CCTV Camera 024 </option>
+        <option value="CCTV;025;a;-L "> Artimis CCTV Camera 025 </option>
+        <option value="CCTV;026;a;-L "> Artimis CCTV Camera 026 </option>
+        <option value="CCTV;027;a;-L "> Artimis CCTV Camera 027 </option>
+        <option value="CCTV;028;a;-L "> Artimis CCTV Camera 028 </option>
+        <option value="CCTV;029;a;-L "> Artimis CCTV Camera 029 </option>
+        <option value="CCTV;030;a;-L "> Artimis CCTV Camera 030 </option>
+        <option value="CCTV;031;a;-L "> Artimis CCTV Camera 031 </option>
+        <option value="CCTV;032;a;-L "> Artimis CCTV Camera 032 </option>
+        <option value="CCTV;033;a;-L "> Artimis CCTV Camera 033 </option>
+        <option value="CCTV;034;a;-L "> Artimis CCTV Camera 034 </option>
+        <option value="CCTV;048;a;-L "> Artimis CCTV Camera 048 </option>
+        <option value="CCTV;050;a;-L "> Artimis CCTV Camera 050 </option>
+        <option value="CCTV;051;a;-L "> Artimis CCTV Camera 051 </option>
+        <option value="CCTV;052;a;-L "> Artimis CCTV Camera 052 </option>
+        <option value="CCTV;053;a;-L "> Artimis CCTV Camera 053 </option>
+        <option value="CCTV;054;a;-L "> Artimis CCTV Camera 054 </option>
+        <option value="CCTV;055;a;-L "> Artimis CCTV Camera 055 </option>
+        <option value="CCTV;056;a;-L "> Artimis CCTV Camera 056 </option>
+        <option value="CCTV;057;a;-L "> Artimis CCTV Camera 057 </option>
+        <option value="CCTV;058;a;-L "> Artimis CCTV Camera 058 </option>
+        <option value="CCTV;059;a;-L "> Artimis CCTV Camera 059 </option>
+        <option value="CCTV;060;a;-L "> Artimis CCTV Camera 060 </option>
+        <option value="CCTV;061;a;-L "> Artimis CCTV Camera 061 </option>
+        <option value="CCTV;064;a;-L "> Artimis CCTV Camera 064 </option>
+        <option value="CCTV;065;a;-L "> Artimis CCTV Camera 065 </option>
+        <option value="CCTV;067;a;-L "> Artimis CCTV Camera 067 </option>
+        <option value="CCTV;088;a;-L "> Artimis CCTV Camera 088 </option>
+        <option value="CCTV;089;a;-L "> Artimis CCTV Camera 089 </option>
+        <option value="CCTV;090;a;-L "> Artimis CCTV Camera 090 </option>
+        <option value="CCTV;094;a;-L "> Artimis CCTV Camera 094 </option>
+        <option value="CCTV;095;a;-L "> Artimis CCTV Camera 095 </option>
+        <option value="CCTV;096;a;-L "> Artimis CCTV Camera 096 </option>
+        <option value="CCTV;097;a;-L "> Artimis CCTV Camera 097 </option>
+        <option value="CCTV;099;a;-L "> Artimis CCTV Camera 099 </option>
+        <option value="CCTV;100;a;-L "> Artimis CCTV Camera 100 </option>
+        <option value="CCTV;102;a;-L "> Artimis CCTV Camera 102 </option>
+        <option value="CCTV;103;a;-L "> Artimis CCTV Camera 103 </option>
+        <option value="CCTV;106;a;-L "> Artimis CCTV Camera 106 </option>
+        <option value="CCTV;111;a;-L "> Artimis CCTV Camera 111 </option>
+        <option value="CCTV;113;a;-L "> Artimis CCTV Camera 113 </option>
+        <option value="CCTV;114;a;-L "> Artimis CCTV Camera 114 </option>
+        <option value="CCTV;115;a;-L "> Artimis CCTV Camera 115 </option>
+        <option value="CCTV;116;a;-L "> Artimis CCTV Camera 116 </option>
+        <option value="CCTV;117;a;-L "> Artimis CCTV Camera 117 </option>
+        <option value="CCTV;118;a;-L "> Artimis CCTV Camera 118 </option>
+        <option value="CCTV;119;a;-L "> Artimis CCTV Camera 119 </option>
+        <option value="CCTV;120;a;-L "> Artimis CCTV Camera 120 </option>
+        <option value="CCTV;121;a;-L "> Artimis CCTV Camera 121 </option>
+        <option value="CCTV;122;a;-L "> Artimis CCTV Camera 122 </option>
+        <option value="CCTV;123;a;-L "> Artimis CCTV Camera 123 </option>
+        <option value="CCTV;124;a;-L "> Artimis CCTV Camera 124 </option>
+        <option value="CCTV;125;a;-L "> Artimis CCTV Camera 125 </option>
+        <option value="CCTV;126;a;-L "> Artimis CCTV Camera 126 </option>
+        <option value="CCTV;127;a;-L "> Artimis CCTV Camera 127 </option>
+        <option value="CCTV;128;a;-L "> Artimis CCTV Camera 128 </option>
+        <option value="CCTV;129;a;-L "> Artimis CCTV Camera 129 </option>
+        <option value="CCTV;130;a;-L "> Artimis CCTV Camera 130 </option>
+        <option value="CCTV;131;a;-L "> Artimis CCTV Camera 131 </option>
+        <option value="CCTV;132;a;-L "> Artimis CCTV Camera 132 </option>
+        <option value="CCTV;133;a;-L "> Artimis CCTV Camera 133 </option>
+        <option value="CCTV;134;a;-L "> Artimis CCTV Camera 134 </option>
+        <option value="CCTV;135;a;-L "> Artimis CCTV Camera 135 </option>
+        <option value="CCTV;136;a;-L "> Artimis CCTV Camera 136 </option>
+        <option value="CCTV;137;a;-L "> Artimis CCTV Camera 137 </option>
+        <option value="CCTV;138;a;-L "> Artimis CCTV Camera 138 </option>
+        <option value="CCTV;140;a;-L "> Artimis CCTV Camera 140 </option>
+        <option value="CCTV;141;a;-L "> Artimis CCTV Camera 141 </option>
+        <option value="CCTV;142;a;-L "> Artimis CCTV Camera 142 </option>
+        <option value="CCTV;143;a;-L "> Artimis CCTV Camera 143 </option>
+        <option value="CCTV;144;a;-L "> Artimis CCTV Camera 144 </option>
+        <option value="CCTV;145;a;-L "> Artimis CCTV Camera 145 </option>
+        <option value="CCTV;146;a;-L "> Artimis CCTV Camera 146 </option>
+        <option value="CCTV;147;a;-L "> Artimis CCTV Camera 147 </option>
+        <option value="FEMM;150;;    "> FE/MM        Camera 150 </option>
+        <option value="FEMM;151;;    "> FE/MM        Camera 151 </option>
+        <option value="FEMM;152;;    "> FE/MM        Camera 152 </option>
+        <option value="FEMM;153;;    "> FE/MM        Camera 153 </option>
+        <option value="FEMM;154;;    "> FE/MM        Camera 154 </option>
+        <option value="FEMM;155;;    "> FE/MM        Camera 155 </option>
+        <option value="FEMM;156;;    "> FE/MM        Camera 156 </option>
+        <option value="FEMM;157;;    "> FE/MM        Camera 157 </option>
+        <option value="FEMM;158;;    "> FE/MM        Camera 158 </option>
+        <option value="FEMM;160;;    "> FE/MM        Camera 160 </option>
+        <option value="FEMM;161;;    "> FE/MM        Camera 161 </option>
+        <option value="FEMM;162;;    "> FE/MM        Camera 162 </option>
+        <option value="FEMM;163;;    "> FE/MM        Camera 163 </option>
+        <option value="FEMM;165;;    "> FE/MM        Camera 165 </option>
+        <option value="FEMM;166;;    "> FE/MM        Camera 166 </option>
+        <option value="FEMM;168;;    "> FE/MM        Camera 168 </option>
+        <option value="FEMM;170;;    "> FE/MM        Camera 170 </option>
+        <option value="FEMM;171;;    "> FE/MM        Camera 171 </option>
+        <option value="FEMM;173;;    "> FE/MM        Camera 173 </option>
+        <option value="FEMM;174;;    "> FE/MM        Camera 174 </option>
+        <option value="FEMM;175;;    "> FE/MM        Camera 175 </option>
+        <option value="FEMM;177;;    "> FE/MM        Camera 177 </option>
+        <option value="FEMM;179;;    "> FE/MM        Camera 179 </option>
+        <option value="FEMM;180;;    "> FE/MM        Camera 180 </option>
+        <option value="FEMM;181;;    "> FE/MM        Camera 181 </option>
+        <option value="FEMM;184;;    "> FE/MM        Camera 184 </option>
+        <option value="FEMM;185;;    "> FE/MM        Camera 185 </option>
+        <option value="FEMM;186;;    "> FE/MM        Camera 186 </option>
+        <option value="FEMM;187;;    "> FE/MM        Camera 187 </option>
+        <option value="FEMM;188;;    "> FE/MM        Camera 188 </option>
+        <option value="FEMM;189;;    "> FE/MM        Camera 189 </option>
+      </optgroup>
+    </select> <!-- iSEL -->
+    </label>
+
+    <label for="iINP_camNumber">&nbsp;&nbsp; or&nbsp;&nbsp;&nbsp;Enter&nbsp;camera&nbsp;site&nbsp;number&nbsp;<input id="iINP_camNumber"
+        type="text" size="2" value=""></label>
+    </div>
+
+    <br>&emsp;
+
+    <div class="col-8 col-s-8 col-m-8 col-l-8 col-xl-8">
+      <img id="iIMG0" src=# alt=#>
+    </div>
+
+    <div class="col-4 col-s-4 col-m-4 col-l-4 col-xl-4">
+      <!--
+        &#x25b2 = black up-pointing triangle   for N
+        &#x25c4 = black left-pointing pointer  for W
+        &#x25ba = black right-pointing pointer for E
+        &#x25bc = black down-pointing triangle for S
+        -->
+      <table>
+        <tr>
+          <td></td>
+          <td colspan=5 id="iSPANcompassN" class="compassTextNS"><!-- --></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td><input id="iBTN_N" type="button" disabled value="&#x25b2;" onclick="driveThisWay( event );" ></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td id="iSPANcompassW" class="compassTextEW"><!-- --></td>
+          <td><input id="iBTN_W" type="button" disabled value="&#x25c4;" onclick="driveThisWay( event );" ></td>
+          <td></td>
+          <td> &nbsp;&#x1f698; <!-- oncoming automobile -->
+          <td></td>
+          <td><input id="iBTN_E" type="button" disabled value="&#x25ba;" onclick="driveThisWay( event );" ></td>
+          <td id="iSPANcompassE" class="compassTextEW"><!-- --></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td><input id="iBTN_S" type="button" disabled value="&#x25bc;" onclick="driveThisWay( event );" ></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td colspan=5 id="iSPANcompassS" class="compassTextNS"><!-- --></td>
+          <td></td>
+        </tr>
+      </table>
+    </div>
+
+  </div> <!-- iDIVMain -->
+
+  <!-- ======================================================================= *
+   * Alt - Hidden for normal size, displayed for embiggen                      *
+   * ======================================================================= -->
+  <div id="iDIVAlt" class="col-12" style="display: none;">
+    <img id="iIMG1" src=# alt=# style="opacity: 1;">
+  </div> <!-- iDIVAlt -->
+
+  <!-- ======================================================================= *
+   * Footer                                                                    *
+   * ======================================================================= -->
+  <div id="iDIVFooter">
+    <!--
+      &#x25b2 = black up-pointing triangle   for prev
+      &#x25bc = black down-pointing triangle for next
+      -->
+    <div class="col-6 col-s-6 col-m-6 col-l-6 col-xl-6">
+      <figure>
+        <figcaption id="iFIGCAP1">
+          <!-- -->
+        </figcaption>
+      <input type="button" onclick="nextSel(-1);" value="&#x25b2;">
+      <input type="button" onclick="nextSel(+1);" value="&#x25bc;">
+      </figure>
+    </div>
+
+    <div class="col-2 col-s-2 col-m-2 col-l-2 col-xl-2">
+      <figure>
+        <figcaption id="iFIGCAP2">
+          <!-- -->
+        </figcaption>
+      <input type="button" onclick="nextNum(-1);" value="&#x25b2;">
+      <input type="button" onclick="nextNum(+1);" value="&#x25bc;">
+      </figure>
+    </div>
+  </div> <!-- iDIVFooter -->
+
+</body>
+</html>
