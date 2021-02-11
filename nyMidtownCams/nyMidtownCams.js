@@ -69,7 +69,8 @@
   const logoURL           = "NYCDOT.jpg";
   const inactURL          = "inactive-camera.gif";
   const VTransNotAvailURL = "unavail.png";
-  const HeadCCTV          = "http://207.251.86.238/cctv";
+//const HeadCCTV          = "http://207.251.86.238/cctv";
+  const HeadCCTV          = "https://jpg.nyctmc.org/cctv";
   const TailCCTV          = ".jpg?date=";
 
   var   refreshInterval   =  0.5;             /* Seconds */
