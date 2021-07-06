@@ -1,0 +1,247 @@
+@charset "UTF-8";
+/* ************************************************************************* *
+ * ManhattanCams                                                             *
+ * =============                                                             *
+ * This is a hand-coded web page that displays traffic camera images on      *
+ * Manhattan island, organized along the major N/S avenues.  The HTML, the   *
+ * CSS, and the JavaScript are all original by me and I make no copyright    *
+ * or ownership stipulations.  Note that the camera images that I link to    *
+ * are not mine, but are instead from web sites operated by the NYC DOT.     *
+ *                                                                           *
+ * -John Berenberg, July 2021.                                               *
+ * ************************************************************************* */
+
+/* ************************************************************************* *
+ * I use the following site to validate my CSS.                              *
+ *                                                                           *
+ * http://jigsaw.w3.org/css-validator/                                       *
+ * ************************************************************************* */
+
+/* ************************************************************************* *
+ |                Styles for "responsive web design" (RWD)                   |
+ |                                                                           |
+ | Responsive web design is an approach that makes web pages render well on  |
+ | a variety of devices and window or screen sizes.  It uses only HTML and   |
+ | CSS, and is not a program or a JavaScript.                                |
+ |                                                                           |
+ | The styles in this section are based on the tutorial pages at w3schools.  |
+ * ************************************************************************* */
+
+  * {box-sizing: border-box;}
+
+  /* ******************************************** *
+   | Extra-small devices (phones, 600px and down) |
+   * ******************************************** */
+  /*
+   |  +- - - - +
+   |  |        |
+   |  |        |
+   |  |        |
+   |  +- - - - +
+   |  |        |
+   */
+    [class*="col-"]  { width: 100%; }
+
+  /* *************************************************************** *
+   | Small devices (portrait tablets and large phones, 600px and up) |
+   * *************************************************************** */
+  /*
+   |  +- - - - +- - - - +
+   |  |  .  .  |  .  .  |
+   |  |  .  .  |  .  .  |
+   |  |  .  .  |  .  .  |
+   |  +- - - - +- - - - +
+   |  |  .  .  |  .  .  |
+   */
+  @media only screen and (min-width: 600px) {
+    .col-s-1    { width:   8.33%; }
+    .col-s-2    { width:  16.66%; }
+    .col-s-3    { width:  25%;    }
+    .col-s-4    { width:  33.33%; }
+    .col-s-5    { width:  41.66%; }
+    .col-s-6    { width:  50%;    }
+    .col-s-7    { width:  58.33%; }
+    .col-s-8    { width:  66.66%; }
+    .col-s-9    { width:  75%;    }
+    .col-s-10   { width:  83.33%; }
+    .col-s-11   { width:  91.66%; }
+    .col-s-12   { width: 100%;    }
+  }
+
+  /* *************************************************************** *
+   | Medium devices                (landscape tablets, 768px and up) |
+   * *************************************************************** */
+  /*
+   |  +- - - - +- - - - +- - - - +
+   |  |  .  .  |  .  .  |  .  .  |
+   |  |  .  .  |  .  .  |  .  .  |
+   |  |  .  .  |  .  .  |  .  .  |
+   |  +- - - - +- - - - +- - - - +
+   |  |  .  .  |  .  .  |  .  .  |
+   */
+  @media only screen and (min-width: 768px) {
+    .col-m-1    { width:   8.33%; }
+    .col-m-2    { width:  16.66%; }
+    .col-m-3    { width:  25%;    }
+    .col-m-4    { width:  33.33%; }
+    .col-m-5    { width:  41.66%; }
+    .col-m-6    { width:  50%;    }
+    .col-m-7    { width:  58.33%; }
+    .col-m-8    { width:  66.66%; }
+    .col-m-9    { width:  75%;    }
+    .col-m-10   { width:  83.33%; }
+    .col-m-11   { width:  91.66%; }
+    .col-m-12   { width: 100%;    }
+  }
+  /* *************************************************************** *
+   | Large devices                  (laptops/desktops, 992px and up) |
+   * *************************************************************** */
+  /*
+   |  +- - - - +- - - - +- - - - +- - - - +
+   |  |  .  .  |  .  .  |  .  .  |  .  .  |
+   |  |  .  .  |  .  .  |  .  .  |  .  .  |
+   |  |  .  .  |  .  .  |  .  .  |  .  .  |
+   |  +- - - - +- - - - +- - - - +- - - - +
+   |  |  .  .  |  .  .  |  .  .  |  .  .  |
+   */
+  @media only screen and (min-width: 992px) {
+    .col-l-1    { width:   8.33%; }
+    .col-l-2    { width:  16.66%; }
+    .col-l-3    { width:  25%;    }
+    .col-l-4    { width:  33.33%; }
+    .col-l-5    { width:  41.66%; }
+    .col-l-6    { width:  50%;    }
+    .col-l-7    { width:  58.33%; }
+    .col-l-8    { width:  66.66%; }
+    .col-l-9    { width:  75%;    }
+    .col-l-10   { width:  83.33%; }
+    .col-l-11   { width:  91.66%; }
+    .col-l-12   { width: 100%;    }
+  }
+  /* *************************************************************** *
+   | Extra large devices (large laptops and desktops, 1200px and up) |
+   * *************************************************************** */
+  /*
+   |  +- - - - +- - - - +- - - - +- - - - +
+   |  |  .  .  |  .  .  |  .  .  |  .  .  |
+   |  |  .  .  |  .  .  |  .  .  |  .  .  |
+   |  |  .  .  |  .  .  |  .  .  |  .  .  |
+   |  +- - - - +- - - - +- - - - +- - - - +
+   |  |  .  .  |  .  .  |  .  .  |  .  .  |
+   */
+  @media only screen and (min-width:1200px) {
+    .col-xl-1   { width:   8.33%; }
+    .col-xl-2   { width:  16.66%; }
+    .col-xl-3   { width:  25%;    }
+    .col-xl-4   { width:  33.33%; }
+    .col-xl-5   { width:  41.66%; }
+    .col-xl-6   { width:  50%;    }
+    .col-xl-7   { width:  58.33%; }
+    .col-xl-8   { width:  66.66%; }
+    .col-xl-9   { width:  75%;    }
+    .col-xl-10  { width:  83.33%; }
+    .col-xl-11  { width:  91.66%; }
+    .col-xl-12  { width: 100%;    }
+  }
+
+  [class*="col-"]
+                { float  : left;
+                  padding: 1px    1px    0px   0px; }
+                    /*     top  right bottom  left */
+  .row::after   { content: "";
+                  clear  : both;
+                  display: table; }
+
+/* ************************************************************************* *
+ |                               Other styles                                |
+ |                                                                           |
+ | These are the styles specific to this web page.                           |
+ * ************************************************************************* */
+
+/* - - - - - - - - - - - - - - - - - - - - - - - *
+ | foo selects HTML elements <foo>               |
+ * - - - - - - - - - - - - - - - - - - - - - - - */
+
+  body        { margin-top       : 0px;          }
+
+/*
+  div         { border           : 1px solid lightBlue; }
+*/
+
+  table       { border-spacing   : 1em;
+                border-collapse  : collapse;     }
+
+  figure      { margin           : 0;
+                border           : none;
+                padding          : 0;
+         /*     margin-block-start  : 0;
+                margin-block-end    : 0;
+                margin-inline-start : 0;
+                margin-inline-end   : 0;     */
+                                                 }
+
+  figcaption  { font-family : "Open Sans","Lucida Sans Unicode",Verdana,Tahoma,"DejaVu Sans",sans-serif;
+                font-size   : 12pt;
+                font-weight : normal;
+                text-align  : center;
+                background-color : #993300;
+                color       : white;             }
+
+  img         { height      : auto;
+                opacity     : 1;
+                transition  : 2s;
+                border      : 5px Ridge Gray;    }
+
+/* - - - - - - - - - - - - - - - - - - - - - - - *
+ | .foo selects HTML elements with class="foo"   |
+ * - - - - - - - - - - - - - - - - - - - - - - - */
+
+  .rtjustify  { text-align  : right;             }
+
+  .center     { text-align  : center;            }
+
+  .prewrap    { white-space : pre-wrap;          }
+
+  .radio,
+  .nowrap     { white-space : nowrap;            }
+
+  .hdr1Text   { background-color : DarkOrchid;
+                color            : White;        }
+
+  .hdr2Text   { background-color : Bisque;       }
+
+  .hdr3Text   { background-color : Cyan;
+                font-size        : 10pt;         }
+
+  .remark     { display     : none;
+                background-color: red;
+                font-size   : 16pt;
+                margin      : 0px;
+                border      : 1px Solid Black;
+                padding     : 0.5em;             }
+
+  .groovy     { border      : 0.5em Groove Aqua;
+                padding-bottom : 6px;            }
+
+  .stickywrapper { position    : sticky;
+                   position    :-webkit-sticky;
+                   top         : 0px;
+                   left        : 0px;            }
+
+  .fixedWidthButton { min-width : 15ch;          }
+
+/* - - - - - - - - - - - - - - - - - - - - - - - *
+ | #foo selects the HTML element with id="foo"   |
+ * - - - - - - - - - - - - - - - - - - - - - - - */
+
+  img#iIMG00  {}
+
+  #iDIVMain,
+  #iDIVAlt,
+  #iDIVFooter { background-color: orange;
+                margin      : 0;
+                border      : none;
+             /* padding     : 0; */
+                                               }
+
+/* - - - - - - - - - - - - - - - - - - - - - - - */
