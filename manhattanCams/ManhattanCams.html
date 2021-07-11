@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <title>ManhattanCams</title>
+  <meta   charset="UTF-8">
+  <meta   name="viewport" content="width=device-width, initial-scale=1.0">
+  <link   rel="icon" type="image/png" href="favicon.png">
+
+  <!-- ********************************************************************* *
+   * ManhattanCams                                                           *
+   * =============                                                           *
+   * This is a hand-coded web page that displays traffic camera images on    *
+   * Manhattan island, organized along the major N/S avenues.  The HTML, the *
+   * CSS, and the JavaScript are all original by me and I make no copyright  *
+   * or ownership stipulations.  Note that the camera images that I link to  *
+   * are not mine, but are instead from web sites operated by the NYC DOT.   *
+   *                                                                         *
+   * -John Berenberg, July 2021.                                             *
+   * ********************************************************************* -->
+
+  <!-- ********************************************************************* *
+   * I use the following site to validate my HTML.                           *
+   *                                                                         *
+   * https://validator.w3.org/                                               *
+   * ********************************************************************* -->
+
+  <!-- ********************************************************************* *
+   * The following section aborts the script if the browser embeds a version *
+   * of JavaScript that is too down-level.  Ironically, the language=version *
+   * script element is deprecated in favor of type=text/javascript, except   *
+   * that does not allow the version to be disclosed.  Live with it.         *
+   *                                                                         *
+   * Particular up-level JavaScript features used include arrow function     *
+   * syntax, array and object destructuring syntax, and template literal     *
+   * syntax.                                                                 *
+   * ********************************************************************* -->
+                                                                <!-- As of July 2021 -->
+<!-- http://jsfiddle.net/Ac6CT/ -->
+  <script type="text/javascript">   JSversion = 1.0; </script>
+  <script language="Javascript1.1"> JSversion = 1.1; </script>
+  <script language="Javascript1.2"> JSversion = 1.2; </script>
+  <script language="Javascript1.3"> JSversion = 1.3; </script>  <!-- My IE -->
+  <script language="Javascript1.4"> JSversion = 1.4; </script>
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+  <script language="Javascript1.5"> JSversion = 1.5; </script>  <!-- My FireFox -->
+  <script language="Javascript1.6"> JSversion = 1.6; </script>
+  <script language="Javascript1.7"> JSversion = 1.7; </script>  <!-- My Chrome --> <!-- My Edge --> <!-- My Opera -->
+  <script language="Javascript1.8"> JSversion = 1.8; </script>
+  <script language="Javascript1.9"> JSversion = 1.9; </script>
+  <script>
+    if ( JSversion < 1.5 ) {
+      /*       u2639 = white frowning face */
+      alert( "\u2639 This page"
+           + "\n      [ " + document.URL + " ]"
+           + "\nuses JavaScript features that are not supported by this browser."
+           + "\n\nThe JavaScript version (not the browser version) is " + JSversion + " but needs to be at least 1.5."
+           + "\n\nTry a different browser." );
+      window.location.href = "about:blank";
+    }
+  </script>
+  <!-- ********************************************************************* *
+   * End of JavaScript version check.                                        *
+   * ********************************************************************* -->
+
+  <link   rel="stylesheet" type="text/css" href="ManhattanCams.css">
+
+  <script src="mcamdefs.js"></script>
+  <script src="ManhattanCams.js"></script>
+</head>
+
+
+<!-- ================================================================== *
+ *                         The HTML <body ...>                          *
+ * ================================================================== -->
+
+<body onload="setGlobals();">
+  <!--
+      XS              S                       M                                 L                                    XL
+  +========+ +========+========+ +========+========+========+ +========+========+========+========+ +========+========+========+========+
+  |- TOD- -| |- TOD - - |-Size-| |- TOD - - - - - -|- Size -| |- TOD - - - - - - - - - - |- Size -| |- TOD - - - - - - - - - - - |-Size-|
+  |- Size -| |-Refresh control-| |- Refresh control- - - - -| |- Refresh control - - - - - - - - -| |- Refresh control - - - - - - - - -|
+  |-Refresh| |-Radio buttons- -| |- Radio buttons- - - - - -| |- Radio buttons - - - - - - - - - -| |- Radio buttons - - - - - - - - - -|
+  |-  "   -| +========+========+ +========+========+========+ +========+========+========+========+ +========+========+========+========+
+  |-Radio -| |  .  .  |  .  .  | |  .  .  |  .  .  |  .  .  | |  .  .  |  .  .  |  .  .  |  .  .  | |  .  .  |  .  .  |  .  .  |  .  .  |
+  |-  "   -| |  Image |  Image | |  Image |  Image |  Image | |  Image |  Image |  Image |  IMage | |  Image |  Image |  Image |  Image |
+  +========+ |  .  .  |  .  .  | |  .  .  |  .  .  |  .  .  | |  .  .  |  .  .  |  .  .  |  .  .  | |  .  .  |  .  .  |  .  .  |  .  .  |
+  |        | +- - - - +- - - - + +- - - - +- - - - +- - - - + +- - - - +- - - - +- - - - +- - - - + +- - - - +- - - - +- - - - +- - - - +
+  |  Image | |  .  .  |  .  .  | |  .  .  |  .  .  |  .  .  | |  .  .  |  .  .  |  .  .  |  .  .  | |  .  .  |  .  .  |  .  .  |  .  .  |
+  |        | |  .  .  |  .  .  | |  .  .  |  .  .  |  .  .  | |  .  .  |  .  .  |  .  .  |  .  .  | |  .  .  |  .  .  |  .  .  |  .  .  |
+    -->
+
+  <!-- ======================================================================= *
+   * Header                                                                    *
+   * ======================================================================= -->
+  <div id="iDIVHdr" class="stickywrapper">
+    <!-- I will stick to the screen when you reach my scroll position -->
+
+    <!-- ======================================================================= *
+     * Line 1 left: TOD clock                                                    *
+     * ======================================================================= -->
+      <span id="iSPAN_TOD" class="hdr1Text col-12 col-s-8 col-m-9 col-l-9 col-xl-10">
+        <!-- TOD -->
+      </span>
+
+    <!-- ======================================================================= *
+     * Line 1 right: dynamic window size and orientation                         *
+     * ======================================================================= -->
+      <span id="iSPANW_Sz" class="hdr1Text rtjustify col-12 col-s-4 col-m-3 col-l-3 col-xl-2">
+        <!-- W_Sz -->
+      </span>
+
+    <!-- ======================================================================= *
+     * Line 2: image refresh rate, countdown, and associated buttons             *
+     * ======================================================================= -->
+    <span class="hdr2Text col-12 col-s-12 col-m-12 col-l-12 col-xl-12">
+
+        <label>
+          &nbsp;
+            <input type="button" id="iINP_toggleTimer"
+                   class="fixedWidthButton"
+                   value="Pause Timer"
+                   onclick="toggleTimer();">
+          &nbsp;
+        </label>
+
+        <label class="nowrap">
+          Refresh every <input id="iINP_refreshTime" type="text" size="2" value=""> seconds.
+        </label>
+
+        <label class="nowrap">
+          &nbsp;
+          <span id="iSPANinfo">Next refresh in <u><span id="iSPANCountDown"></span></u> seconds.</span>
+        </label>
+
+        <label class="nowrap">
+          &nbsp;
+            <button type="button" id="iBTN_refresh"
+                    class="fixedWidthButton"
+                    onclick="iINP_refreshTime.dispatchEvent( anEnterKeyupEvent );" >
+              Manual Refresh
+            </button>
+          &nbsp;
+        </label>
+      </span>
+
+    <!-- ======================================================================= *
+     * Line 3: radio buttons for avenue selection                                *
+     * ======================================================================= -->
+      <span class="hdr3Text col-12 col-s-12 col-m-12 col-l-12 col-xl-12">
+        <label class="radio"><input type="radio" name="aveSelect"         value="ave12"    >12 Ave   </label>
+        <label class="radio"><input type="radio" name="aveSelect"         value="ave11"    >11 Ave   </label>
+        <label class="radio"><input type="radio" name="aveSelect"         value="broadway" >Broadway </label>
+        <label class="radio"><input type="radio" name="aveSelect"         value="ave10"    >10 Ave   </label>
+        <label class="radio"><input type="radio" name="aveSelect"         value="ave9"     >9 Ave    </label>
+        <label class="radio"><input type="radio" name="aveSelect"         value="aveStNick">St Nick  </label>
+        <label class="radio"><input type="radio" name="aveSelect"         value="ave8"     >8 Ave    </label>
+        <label class="radio"><input type="radio" name="aveSelect"         value="ave7"     >7 Ave    </label>
+        <label class="radio"><input type="radio" name="aveSelect"         value="ave6"     >6 Ave    </label>
+        <label class="radio"><input type="radio" name="aveSelect" checked value="ave5"     >5 Ave    </label>
+        <label class="radio"><input type="radio" name="aveSelect"         value="aveMad"   >Madison  </label>
+        <label class="radio"><input type="radio" name="aveSelect"         value="avePark"  >Park     </label>
+        <label class="radio"><input type="radio" name="aveSelect"         value="aveLex"   >Lexington</label>
+        <label class="radio"><input type="radio" name="aveSelect"         value="ave3"     >3 Ave    </label>
+        <label class="radio"><input type="radio" name="aveSelect"         value="ave2"     >2 Ave    </label>
+        <label class="radio"><input type="radio" name="aveSelect"         value="ave1"     >1 Ave    </label>
+      </span>
+
+    <!-- ======================================================================= *
+     * Legacy comment blocks, no longer used                                     *
+     * ======================================================================= -->
+      <div id=iDIVhdrL class="remark col-12 col-s-6 col-m-6 col-l-7 col-xl-8">
+<!--
+        This script refreshes all the camera images
+        from the internet at an interval you can adjust.
+        Yes, you can select 0.5 seconds.
+        <br><br>NYCDOT refreshes the images on the internet as
+        often as every second.
+-->
+      </div>
+
+      <div id=iDIVhdrR class="remark col-12 col-s-6 col-m-6 col-l-5 col-xl-4">
+<!--
+        <label for="iINP_refreshTime" class="prewrap"
+          >Refresh every <input id="iINP_refreshTime" type="text" size="2" value=""> seconds.</label>
+        <br>
+          <span id="iSPANinfo" class="prewrap">Next reload in <u><span id="iSPANCountDown"></span></u> seconds.</span>
+        <br>
+          <input  type="button" id="iINP_toggleTimer" onclick="toggleTimer();" value="Pause Timer">
+          <button type="button" id="iBTN_refresh"     onclick="iINP_refreshTime.dispatchEvent( anEnterKeyupEvent );" >
+            Manual Refresh
+          </button>
+        <br>
+          <span class="prewrap">Click on camera image to <span style="font-size: 150%;">embiggen</span>.</span>
+-->
+      </div>
+
+  <!-- End of Hdr -->
+  </div>
+
+  <!-- ======================================================================= *
+   * Main - Displayed for normal size, hidden for embiggen                     *
+   * ======================================================================= -->
+    <div id=iDIVMain class="col-12 col-s-12 col-m-12 col-l-12 col-xl-12">
+      <!-- iDIVMain -->
+    </div>
+
+  <!-- ======================================================================= *
+   * Alt - Hidden for normal size, displayed for embiggen                      *
+   * ======================================================================= -->
+    <div id="iDIVAlt" class="col-12 col-s-12 col-m-12 col-l-12 col-xl-12" style="display:none;">
+      <!--iDIVAlt -->
+      Click on the image to exit full screen.
+      <figure>
+        <figcaption id="iFIGCAPAlt"><!-- figcaption --></figcaption>
+        <img id="iIMGAlt" src="#" alt="#" style="width:100%;" onClick="toggleEmbiggen(event)" >
+      </figure>
+    </div>
+
+  <!-- ======================================================================= *
+   * Footer                                                                    *
+   * ======================================================================= -->
+    <div id="iDIVFooter">
+      <!-- iDIVFooter -->
+      Images harvested from NYC DoT at webcams.nyctmc.org
+    </div>
+
+</body>
+</html>
